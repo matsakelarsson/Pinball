@@ -18,13 +18,16 @@ type Path = [Position]
 validGrid :: Grid -> Bool
 validGrid [] = error "Grid empty"
 validGrid (x:xs)
-          |length (x:xs) == validGrid' (x:xs) = True
+          |length (x:xs) == rowLength (x:xs) = True
           |otherwise = False
-          where validGrid' (x:xs)  
-            |length (x) /= rowLength = length (x)
-            |otherwise = rowLength 
-            where rowLength = validGrid' xs
 
+rowLength :: Grid -> Int
+rowLength [] = error "Grid empty"
+rowLength [x] = length x
+rowLength (x:xs)
+             |length (x) == rowLength' = length (x)
+             |otherwise = rowLength'
+             where rowLength' = rowLength xs
 
 validEntryPoint :: Grid -> Border -> Bool
 validEntryPoint _ _ = True
@@ -77,4 +80,4 @@ test5 = TestCase $ assertEqual "Trajectory (South, 2)" traj (trajectory goodgrid
 
 runTests = runTestTT $ TestList [test0, test1, test2, test3, test4, test5]
 
-extraTests = runTestTT $ TestList [] -- Add your tests to this list
+extraTests = rutTestTT $ TestList [] -- Add your tests to this list
