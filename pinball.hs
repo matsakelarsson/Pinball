@@ -25,12 +25,16 @@ rowLength :: Grid -> Int
 rowLength [] = error "Grid empty"
 rowLength [x] = length x
 rowLength (x:xs)
-             |length (x) == rowLength' = length (x)
-             |otherwise = rowLength'
-             where rowLength' = rowLength xs
+          |length (x) == rowLength' = length (x)
+          |otherwise = rowLength'
+          where rowLength' = rowLength xs
 
 validEntryPoint :: Grid -> Border -> Bool
-validEntryPoint _ _ = True
+validEntryPoint [] (d, y) = error "Grid empty"
+validEntryPoint (x:xs) (North, y) = y == 0
+validEntryPoint (x:xs) (South, y) = y == length (x:xs)
+validEntryPoint (x:xs) (West, y) = y == 0
+validEntryPoint (x:xs) (East, y) = y == length x
 
 trajectory :: Grid -> Border -> Path
 trajectory _ _ = []
