@@ -1,5 +1,6 @@
 import Prelude hiding (Left, Right, flip)
 import Test.HUnit hiding (Path)
+import System.IO
 
 data Cell = Empty | Left | Right
   deriving (Show, Eq)
@@ -31,16 +32,34 @@ rowLength (x:xs)
 
 validEntryPoint :: Grid -> Border -> Bool
 validEntryPoint [] (d, y) = error "Grid empty"
-validEntryPoint (x:xs) (North, y) = y == 0
-validEntryPoint (x:xs) (South, y) = y == length (x:xs)
-validEntryPoint (x:xs) (West, y) = y == 0
-validEntryPoint (x:xs) (East, y) = y == length x
+validEntryPoint _  (North, x) = 0 == x
+validEntryPoint g (South, x) = length g == x
+validEntryPoint _ (West, y) =  0 == y
+validEntryPoint (g:gs) (East, y) = length g == y
 
 trajectory :: Grid -> Border -> Path
-trajectory _ _ = []
+trajectory g b = []
+
+
+convertBorderToPosition :: Grid -> Border -> Position
+convertBorderToPosition _ (North, x) = (x-1, 0)
+convertBorderToPosition g (South, x) = (x-1, length g)
+convertBorderToPosition _ (West, y) = (0, y-1)
+convertBorderToPosition (g:gs) (East, y) = (length g, y-1)
+
+
+--convertPositionToBorder :: Position -> Border
+--convertPositionToBorder (x, y)
+   --            |x == length 
+
+
 
 play :: Grid -> Border -> Border
-play _ b = b
+play g b = b
+ --     putStrLn "Where do you want to start?" 
+ --     print g
+ --     b <- getLine
+  --    return (last (trajectory g b))
 
 
 -- HUnit Test Cases
@@ -84,4 +103,4 @@ test5 = TestCase $ assertEqual "Trajectory (South, 2)" traj (trajectory goodgrid
 
 runTests = runTestTT $ TestList [test0, test1, test2, test3, test4, test5]
 
-extraTests = rutTestTT $ TestList [] -- Add your tests to this list
+extraTests = runTestTT $ TestList [] -- Add your tests to this list
