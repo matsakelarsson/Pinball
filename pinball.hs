@@ -1,5 +1,4 @@
 import Prelude hiding (Left, Right, flip)
-import Test.HUnit hiding (Path)
 import System.IO
 
 data Cell = Empty | Left | Right
@@ -30,33 +29,29 @@ rowLength (x:xs)
           |otherwise = rowLength'
           where rowLength' = rowLength xs
 
-validEntryPoint :: Grid -> Border -> Bool
+validEntryPoint :: Grid -> Border -> Position
 validEntryPoint [] (d, y) = error "Grid empty"
-validEntryPoint _  (North, x) = 0 == x
-validEntryPoint g (South, x) = length g == x
-validEntryPoint _ (West, y) =  0 == y
-validEntryPoint (g:gs) (East, y) = length g == y
+validEntryPoint g (North, x) = if 0 <= x && x < length g then (x, 0) else error "Coordinates Outside of Grid"
+validEntryPoint g (South, x) = if 0 <= x && x < length g then (x, length g -1) else error "Coordinates Outside of Grid"
+validEntryPoint (g:gs) (West, y) = if 0 <= y && y < length g then (0, y) else error "Coordinates Outside of Grid"
+validEntryPoint (g:gs) (East, y) = if 0 <= y && y < length g then (length g -1, y) else error "Coordinates Outside of Grid"
 
 trajectory :: Grid -> Border -> Path
 trajectory g b = []
 
 
-convertBorderToPosition :: Grid -> Border -> Position
-convertBorderToPosition _ (North, x) = (x-1, 0)
-convertBorderToPosition g (South, x) = (x-1, length g)
-convertBorderToPosition _ (West, y) = (0, y-1)
-convertBorderToPosition (g:gs) (East, y) = (length g, y-1)
+
 
 
 --convertPositionToBorder :: Position -> Border
 --convertPositionToBorder (x, y)
-   --            |x == length 
+   --            |x == length
 
 
 
 play :: Grid -> Border -> Border
 play g b = b
- --     putStrLn "Where do you want to start?" 
+ --     putStrLn "Where do you want to start?"
  --     print g
  --     b <- getLine
   --    return (last (trajectory g b))
@@ -79,28 +74,3 @@ badgrid = [[Empty, Left,  Empty, Empty, Right],
            [Empty, Empty, Right, Empty],
            [Right, Empty, Empty, Empty, Empty],
            [Empty, Empty, Empty, Left,  Empty]]
-
--- test cases
-test0 = TestCase $ assertBool "Valid Grid"
-                   (validGrid goodgrid)
-
-test1 = TestCase $ assertBool "Invalid Grid"
-                   (not (validGrid badgrid))
-
-test2 = TestCase $ assertBool "Valid Entry Point"
-                   (validEntryPoint goodgrid (South, 3))
-
-test3 = TestCase $ assertBool "Invalid Entry Point"
-                   (not (validEntryPoint goodgrid (South, 12)))
-
-test4 = TestCase $ assertEqual "Play (South, 3)"
-                   (South, 1) (play goodgrid (South, 2))
-
-
-test5 = TestCase $ assertEqual "Trajectory (South, 2)" traj (trajectory goodgrid (South, 2))
-  where traj = [(2, 4), (2, 3), (2, 2), (3, 2), (4, 2), (4, 1),
-                (3, 1), (2, 1), (1, 1), (1, 2), (1, 3), (1, 4)]
-
-runTests = runTestTT $ TestList [test0, test1, test2, test3, test4, test5]
-
-extraTests = runTestTT $ TestList [] -- Add your tests to this list
